@@ -89,3 +89,8 @@ void *StdInThread(void *arg)
 
   return(NULL);
 }
+
+void sig_term(int sig)
+{
+  EndFlag=1;
+}
