@@ -59,3 +59,33 @@ void *MyEthThread(void *arg)
 
   return(NULL);
 }
+
+void *StdInThread(void *arg)
+{
+  int nready;
+  struct pollfd targets[1];
+  u_int8_t buf[2048];
+
+  targets[0].fd=fileno(stdin);
+  targets[0].events=POLLIN|POLLERR;
+
+  while(EndFlag==0){
+    switch((nready=poll(targets,1,1000))){
+      case -1:
+        if(erron!=EINTR){
+          perror("poll");
+        }
+        break;
+      case 0:
+        break;
+      default:
+        if(targets[0].rebents&(POLLIN|POLLERR)){
+          fgets(buf, sizeof(buf),stdin);
+          DoCmd(buf);
+        }
+        break;
+    }
+  }
+
+  return(NULL);
+}
