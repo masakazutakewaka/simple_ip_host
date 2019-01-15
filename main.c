@@ -117,3 +117,62 @@ int ending() {
 
   return(0);
 }
+
+int show_ifreq(char *name)
+{
+  char buf1[80];
+  int soc;
+  struct ifreq ifreq;
+  struct sockaddr_in addr;
+
+  if((soc=socket(AF_INET,SOCK_DGRAM,0))==-1){
+    perror("socket");
+    return(-1);
+  }
+
+  strcpy(ifreq,ifr_name,name);
+
+  if(ioctl(soc, SIOCGIFFLAGS,&ifreq)==-1){
+    perror("ioctl:flags");
+    close(sec);
+    return(-1);
+  }
+
+  if(ifreq.ifr_flags&IFF_UP){printf("UP ");}
+  if(ifreq.ifr_flags&IFF_BROADCAST){printf("BROADCAST ");}
+  if(ifreq.ifr_flags&IFF_PROMISC){printf("PROMISC ");}
+  if(ifreq.ifr_flags&IFF_MULTICAST){printf("MULTICAST ");}
+  if(ifreq.ifr_flags&IFF_LOOPBACK){printf("LOOPBACK ");}
+  if(ifreq.ifr_flags&IFF_POINTOPOINT){printf("P2P ");}
+  printf("\n");
+
+  if(ioctl(soc,SIOCGIFMTU,&ifreq)==-1){
+    perror("ioctl:mtu");
+  }
+  else{
+    printf("mtu=%d\n",ifreq.ifr_mtu);
+  }
+
+  if(ioctl(soc,SIOCGIFADDR,&ifreq)==-1){
+    perror("ioctl:addr");
+  }
+  else if(ifreq.ifr_addr.sa_family!=AF_INET){
+    printf("not AF_INET\n");
+  }
+  else {
+    memcpy(&addr,&ifreq.ifr_adr,sizeof(struct sockaddr_in));
+    printf("myip=%s\n",inet_ntop(AF_INET,&addr.sin_addr,buf,sizeof(buf1)));
+    Param.myip=addr.sin_addr;
+  }
+
+  close(soc);
+
+  if(GetMacAddress(name,Param.mymac)==-1){
+    printf("GetMacAddress:error");
+  }
+  else{
+    printf("mymac=%s\n",my_ether_ntoa_r(Param.mymac,buf1));
+  }
+
+  return(0);
+}
