@@ -94,3 +94,26 @@ void sig_term(int sig)
 {
   EndFlag=1;
 }
+
+int ending() {
+  struct ifreq if_req;
+
+  printf("ending\n");
+
+  if(DeviceSoc!=-1) {
+    strcpy(if_req.ifr_name,Param.device);
+    if(ioctl(DeviceSoc,SIOCSIFFLAG,&if_req)<0){
+      perror("ioctl");
+    }
+
+    if_req.ifr_flags=if_req.ifr_flags&~IFF_PROMISC;
+    if(ioctl(DeviceSoc,SIOCSIFFLAG,&if_req)<0){
+      perror("ioctl");
+    }
+
+    close(DeviceSoc);
+    DeviceSoc=-1;
+  }
+
+  return(0);
+}
