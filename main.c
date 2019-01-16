@@ -176,3 +176,77 @@ int show_ifreq(char *name)
 
   return(0);
 }
+
+int main(int aergc,char *argv[])
+{
+  char buf1[80];
+  int i,paramFlag;
+  pthread_attr_t attr;
+  pthread_t thread_id;
+
+  SetDefaultParam();
+
+  paramFlag=0;
+  for(i=1;i<argc;i++){
+    if(ReadParam(argv[i])==-1){
+      exit(-1);
+    }
+    paramFlag=1;
+  }
+  if(paramFlag==0){
+    if(ReadParam("./MyEth.ini")==-1){
+      exit(-1);
+    }
+  }
+
+  printf("IP-TTL=%d\n",Param.IpTTL);
+  printf("IP-MTU=%d\n",Param.IpMTU);
+
+  srandom(time(NULL));
+
+  IpRecvBufInit();
+
+  if((DeviceSoc=init_socket(Param.device))==-1){
+    exit(-1);
+  }
+
+  printf("device=%s\n",Param.device);
+  printf("++++++++++++++++++++++++++++++++++++++++\n");
+  show_ifreq(Param.device);
+  printf("++++++++++++++++++++++++++++++++++++++++\n");
+
+  printf("vmac=%s\n",my_ether_ntoa_r(Param.vmac,buf1));
+  printf("vip=%s\n",inet_ntop(AF_INET,&Param.vip,buf1,sizeof(buf1)));
+  printf("vmask=%s\n",inet_ntop(AF_INET,&Param.vmask,buf1,sizeof(buf1)));
+  printf("gateway=%s\n",inet_ntop(AF_INET,&Param.gateway,buf1,sizeof(buf1)));
+
+  signal(SIGINT,sig_term);
+  signal(SIGTERM,sig_term);
+  signal(SIGQUIT,sig_term);
+
+  signal(SIGPIPE,SIG_IGN);
+
+  pthread_attr_init(&attr);
+  pthread_attr_setstacksize(&attr,102400);
+  pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+  if(pthread_create(&thread_id,&attr,MyEtherThread,NULL)!=0){
+    printf("pthread_create:error\n");
+  }
+  if(pthread_create(&thread_id,&attr,StdInThread,NULL)!=0){
+    printf("pthread_create:error\n");
+  }
+
+  if(ArpCheckGArp(DeviceSoc)==0){
+    printf("GArp check fail\n");
+    return(-1);
+  }
+
+  while(EngFlag==0){
+    sleep(1);
+  }
+
+  ending();
+
+  return(0);
+}
+
