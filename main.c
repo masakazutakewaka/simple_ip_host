@@ -45,7 +45,7 @@ void *MyEthThread(void *arg)
       case 0:
         break;
       default:
-        if(targets[0].rebents&(POLLIN|POLLERR)){
+        if(targets[0].revents&(POLLIN|POLLERR)){
           if((len=read(DeviceSoc,buf,sizeof(buf)))<=0){
             perror("read");
           }
@@ -79,7 +79,7 @@ void *StdInThread(void *arg)
       case 0:
         break;
       default:
-        if(targets[0].rebents&(POLLIN|POLLERR)){
+        if(targets[0].revents&(POLLIN|POLLERR)){
           fgets(buf, sizeof(buf),stdin);
           DoCmd(buf);
         }
