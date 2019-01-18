@@ -29,3 +29,11 @@
 extern PARAM Param;
 
 static char ParamFname=NULL;
+
+int SetDefaultParam()
+{
+  Param.MTU=DEFAULT_MTU;
+  Param.IpTTL=DEFAULT_IP_TTL;
+
+  return(0);
+}
