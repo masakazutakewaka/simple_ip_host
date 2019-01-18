@@ -15,3 +15,8 @@ typedef struct {
   int MTU;
   struct in_addr gateway;
 }PARAMS;
+
+int SetDefaultParam();
+int ReadParam(char *fname);
+int isTargetIPAddr(struct in_addr *addr);
+int isSameSubnet(struct in_addr *addr);
