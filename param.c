@@ -27,3 +27,5 @@
 #include  "param.h"
 
 extern PARAM Param;
+
+static char ParamFname=NULL;
