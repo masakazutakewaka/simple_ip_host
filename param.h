@@ -1,0 +1,6 @@
+#define DEFAULT_MTU (ETHER_MTU)
+#define DEFAULT_IP_TTL (64)
+#define DEFAULT_PING_SIZE (64)
+
+#define DUMMY_WAIT_MS (100)
+#define RETRY_COUNT (3)
