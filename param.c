@@ -112,3 +112,11 @@ int isTargetIPAddr(struct in_addr *addr)
   }
   return(0);
 }
+
+int isSameSubnet(struct in_addr *addr)
+{
+  if((addr->s_addr&Param.vmask.s_addr)==(Param.vip.s_addr&Param.vmask.s_addr)){
+    return(1);
+  }
+  return(0);
+}
