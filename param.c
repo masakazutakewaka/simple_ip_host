@@ -104,3 +104,11 @@ int ReadParam(char *fname)
 
   return(0);
 }
+
+int isTargetIPAddr(struct in_addr *addr)
+{
+  if(Param.vip.s_addr==addr->s_addr){
+    return(1);
+  }
+  return(0);
+}
