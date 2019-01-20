@@ -37,3 +37,70 @@ int SetDefaultParam()
 
   return(0);
 }
+
+int ReadParam(char *fname)
+{
+  FILE *fp;
+  char buf[1024];
+  char *ptr,*saveptr;
+
+  ParamFname=fname;
+
+  if((fp=fopen(fname,"r"))==NULL){
+    printf("%s cannot read\n",fname);
+    return(-1);
+  }
+
+  while(1){
+    fgets(buf,sizeof(buf),fp);
+    if(efof(fp)){
+      break;
+    }
+    ptr=strtok_r(buf,"=",&saveptr);
+    if(ptr!=NULL){
+      if(strcmp(ptr,"IP-TTL")==0){
+        if((ptr=strtok_r(NULL,"\r\n",&saveptr))!=NULL){
+          Param.IpTTL=atoi(ptr);
+        }
+      }
+      else if(strcmp(ptr,"MTU")==0){
+        if((ptr=strtok_r(NULL,"\r\n",&saveptr))!=NULL){
+          Param.MTU=atoi(ptr);
+          if(Param.MTU>ETHERMTU){
+            printf("ReadParam:MTU(%d) <= ETHERMTU(%d)\n",Param.MTU,ETHERMTU);
+            Param.MTU=ETHERMTU;
+          }
+        }
+      }
+      else if(strcmp(ptr,"gateway")==0){
+        if((ptr=strtok_r(NULL,"\r\n",&saveptr))!=NULL){
+          Param.gateway.s_addr=inet_addr(ptr);
+        }
+      }
+      else if(strcmp(ptr,"device")==0){
+        if((ptr=strtok_r(NULL,"\r\n",&saveptr))!=NULL){
+          Param.device=strdup(ptr);
+        }
+      }
+      else if(strcmp(ptr,"vmac")==0){
+        if((ptr=strtok_r(NULL,"\r\n",&saveptr))!=NULL){
+          my_ether_aton(ptr,Param.vmac);
+        }
+      }
+      else if(strcmp(ptr,"vip")==0){
+        if((ptr=strtok_r(NULL,"\r\n",&saveptr))!=NULL){
+          Param.vip.s_addr=inet_addr(ptr);
+        }
+      }
+      else if(strcmp(ptr,"vmask")==0){
+        if((ptr=strtok_r(NULL,"\r\n",&saveptr))!=NULL){
+          Param.vmask.s_addr=inet_addr(ptr);
+        }
+      }
+    }
+  }
+
+  fclose(fp);
+
+  return(0);
+}
